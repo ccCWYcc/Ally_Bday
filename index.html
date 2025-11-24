@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Happy Birthday</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;                         /* allow body to grow beyond viewport */
+     font-family: 'Segoe UI', sans-serif;
+     background: linear-gradient(135deg, #93c5fd, #f9a8d4);
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     overflow: auto;                             /* allow scrolling instead of hiding overflow */
+        transition: background 1s ease-in-out;
+         -webkit-overflow-scrolling: touch;          /* smoother scroll on iOS */
+    }
+
+    /* Password Card */
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      text-align: center;
+      width: 320px;
+      animation: fadeIn 1s forwards;
+    }
+
+    .quiz-img {
+     width: 100%;
+     max-height: 260px;
+     object-fit: contain;
+     border-radius: 10px;
+     margin-bottom: 12px;
+     background: #00000020;
+    }
+
+    h2 {
+      color: #111827;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    input {
+      padding: 10px;
+      width: 80%;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 10px;
+      outline: none;
+    }
+
+    /* Make the long message paragraph justified, with CJK-friendly justification,
+    and center the final short line (emojis) */
+    .message p {
+     text-align: justify;                 /* justify paragraph */
+     text-justify: inter-ideograph;       /* better for Chinese (fallback to inter-word) */
+     -webkit-text-align-last: center;     /* center the last line on webkit */
+     -moz-text-align-last: center;        /* center the last line on Firefox */
+     text-align-last: center;             /* center the last line on other browsers */
+     line-height: 1.65;                   /* optional: improve readability */
+     hyphens: none;                       /* no hyphenation for Chinese */
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #2563eb;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #1e40af;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* REPLACEMENT: happy-birthday background + improved contrast + text shadow */
+/* Hidden Happy Birthday part (replaced) */
+#happy-birthday {
+     display: none;
+     width: 100%;
+     min-height: 100vh;              /* ensure it covers full viewport and scroll area */
+        color: #fadadd;
+     /* overlay gradient + image for better contrast and consistent coverage */
+     background:
+      linear-gradient(rgba(0,0,0,0.28), rgba(0,0,0,0.18)),
+      url('background.jpg') center center / cover no-repeat;
+     overflow-y: auto;
+     padding: 2rem;
+     box-sizing: border-box;
+    }
+
+        /* Make headings and the message text stand out over the photo */
+     #happy-birthday h1,
+        #happy-birthday .message p {
+     text-shadow: 0 2px 8px rgba(0,0,0,0.65);
+    }
+
+    h1 {
+      font-family: 'Great Vibes', cursive;
+      color: #ff8da1;
+      font-size: 3.2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      line-height: 1.4;
+      text-shadow: 1px 1px 3px black;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(11, 80px);
+      grid-template-rows: repeat(9, 80px);
+      gap: 4px;
+      width: max-content;
+      margin: 0 auto;
+    }
+
+   .grid div {
+      width: 80px;
+      height: 80px;
+    }
+
+    .photo {
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 16px;
+      width: 120px;
+      height: 120px;
+    }
+
+    .message p {
+      font-family: "微软雅黑", "Microsoft YaHei", sans-serif;
+      font-size: 1.2rem;
+      text-align: left;
+      line-height: 1.6;
+      margin-top: 2rem;
+    }
+
+    /* Countdown and Fireworks */
+    #countdown-screen, #celebration-screen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #countdown-screen {
+      background: black;
+      color: white;
+      font-size: 6rem;
+      font-weight: bold;
+    }
+
+    #countdown-text {
+      animation: scaleUp 1s ease-in-out infinite;
+    }
+
+    @keyframes scaleUp {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    #celebration-screen {
+      background: black;
+      flex-direction: column;
+    }
+
+    .celebration-text {
+      position: absolute;
+      top: 5%;
+      font-size: 4rem;
+      color: #ed1c24;
+      text-shadow: 2px 2px 5px black;
+      font-family: 'Great Vibes', cursive;
+    }
+
+    #fireworks-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+    }
+
+    #play-music {
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔒 Password Page -->
+<!-- ===== quiz card (replace old password-page div) ===== -->
+<div id="password-page" class="card">
+  <img id="quiz-image" src="q1.JPG" alt="Question 1 image" class="quiz-img">
+  <h2 id="quiz-prompt">欢迎欢迎~为了确认妳是钱钱最爱的杨崽 请输入你们第一次亲亲在哪个学院附近😘 (英文/中文都可以💖)</h2>
+  <input type="text" id="quiz-input" placeholder="Type your answer here">
+  <div style="margin-top:10px;">
+    <button id="quiz-submit">Submit</button>
+  </div>
+  <div id="quiz-feedback" style="margin-top:10px; height:20px; color:#059669;"></div>
+</div>
+
+
+<!-- 🎉 Hidden Happy Birthday Page -->
+<div id="happy-birthday">
+
+    <div id="celebration-screen">
+        <canvas id="fireworks-canvas"></canvas>
+        <video id="blessing-video" src="V1.mp4" preload="auto" playsinline style="display:none;"></video>
+    </div>
+
+    <div id="main-content" style="display:none;">
+
+        <!-- Autoplaying, looping silent montage -->
+        <div id="montage-area" style="text-align:center; margin:0 auto 1.5rem; max-width:1100px;">
+            <video id="main-montage"
+                src="V2_edited.mp4"
+                playsinline autoplay muted preload="auto"
+                style="width:100%; height:auto; border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,0.25);">
+                Your browser does not support HTML5 video.
+            </video>
+        </div>
+
+        <div class="message">
+<p>
+我最亲爱的小宝蛋蛋杨波崽 ^3^<br><br>
+
+27岁生日快乐!!!🍾🎂🎉✨😘 这是和宝在一起后庆祝的第三个生日啦，好开心好珍惜和宝在一起。<br><br>
+
+虽然只是离开宝不久，但感觉度日如年，每天都好想宝。要是之前一天中最期待的时刻是去到宝家宝子开门看到宝的那一瞬间，那现在一天中最迫不及待的时候就是每天和宝视频见到我可爱宝的时候了😘💖<br><br>
+
+爱宝想宝见宝是陪伴我到半夜很迟都不睡觉的动力，每一天都很期待见到宝子~<br><br>
+
+嘿嘿还有当然要非常感谢宝子最近那么用心为我准备的生日惊喜，要是没有宝殿下基础，我都没可能把今天这个准备给宝的做出来呢🫣 更不用说想到用这样的祝福方式，超级仰慕我的可爱优秀杨崽大佬😍😎<br><br>
+
+虽然无法做得很精致，但是希望宝子喜欢我给宝用心准备的小小心意，期待下次和宝见面时再一起好好庆祝💖<br><br>
+
+祝福我的可爱宝人生一帆风顺，学业顺顺利利，当然还有永远爱我😍😘💕 希望我们接下来都一切顺顺利利，和宝儿要永永远远甜甜蜜蜜一直走下去，一起旅游全世界每个角落，一起写下很多很多美好的回忆。<br><br>
+
+感谢宝子一直以来的提携，在这重要的日子再次祝我的可爱杨宝生日快乐!!! 希望我们都平安健康，人生路上妳我互相扶持陪伴，要和宝一起庆祝接下来的每一个生日。愿我的温暖都能进入宝的生命中，一直陪伴我的宝~<br><br>
+
+💝💘💖💗💓💞💕❣️❤️‍🔥<br><br>
+
+爱你的钱钱宝^3^<br><br>
+25.11.2025
+</p>
+        </div>
+    </div>
+
+    <!-- background audio + fallback button -->
+    <audio id="background-music" src="m1.mp3" preload="auto" loop playsinline></audio>
+    <button id="music-fallback" style="display:none; margin-top:10px;">
+        🔊 Tap to Enable Background Music
+    </button>
+</div>
+
+<script>
+/* === quiz configuration ===
+   Each item: { img: 'q1.JPG', prompt: 'text', answers: ['accepted','variants'] }
+*/
+const quiz = [
+  {
+    img: 'q1.JPG',
+    prompt: '欢迎欢迎~为了确认妳是钱钱最爱的杨崽 请输入你们第一次亲亲在哪个学院附近😘 (英文/中文都可以💖)',
+    answers: ['darwin', '达尔文', '达尔文学院']
+  },
+  {
+    img: 'q2.JPG',
+    prompt: '杨崽和钱钱最近一次一起种了啥菜😽',
+    answers: ['aubergine', 'eggplant', '茄子']
+  },
+  {
+    img: 'q3.JPG',
+    prompt: '我们第二次出国旅游的国家😍',
+    answers: ['sweden', '瑞典']
+  }
+];
+
+// state
+let currentQ = 0;
+const quizImage = document.getElementById('quiz-image');
+const quizPrompt = document.getElementById('quiz-prompt');
+const quizInput = document.getElementById('quiz-input');
+const quizSubmit = document.getElementById('quiz-submit');
+const quizFeedback = document.getElementById('quiz-feedback');
+
+function normalizeAnswer(s) {
+  if (!s) return '';
+  // convert full-width spaces, collapse spaces, lowercase
+  return s.replace(/\u3000/g,' ').replace(/\s+/g,' ').trim().toLowerCase();
+}
+
+// show question i
+function showQuestion(i) {
+  currentQ = i;
+  const q = quiz[i];
+  quizImage.src = q.img;
+  quizPrompt.textContent = q.prompt;
+  quizInput.value = '';
+  quizFeedback.textContent = '';
+  quizInput.focus();
+}
+
+// check answer for current question
+function checkQuizAnswer() {
+  const raw = quizInput.value || '';
+  const normalized = normalizeAnswer(raw);
+  const accepted = quiz[currentQ].answers.map(a => normalizeAnswer(a));
+  const correct = accepted.includes(normalized);
+
+  if (correct) {
+    // success feedback
+    quizFeedback.style.color = '#059669';
+    quizFeedback.textContent = 'Correct! ❤️';
+    // small delay to let user see success then move on
+    setTimeout(() => {
+      if (currentQ < quiz.length - 1) {
+        showQuestion(currentQ + 1);
+      } else {
+        // all done -> reveal happy-birthday and play your V1.mp4 immediately (no countdown)
+        document.getElementById('password-page').style.display = 'none';
+        document.getElementById('happy-birthday').style.display = 'block';
+        document.body.style.background = 'black';
+
+        // show celebration screen and play the video
+        const celebrationScreen = document.getElementById('celebration-screen');
+        const blessingVideo = document.getElementById('blessing-video');
+        if (celebrationScreen) celebrationScreen.style.display = 'flex';
+        if (blessingVideo) {
+          blessingVideo.style.display = 'block';
+          blessingVideo.play().catch(() => {
+            alert('Please tap the page to play the video.');
+          });
+        }
+
+        // start fireworks if function is present
+        if (typeof launchFireworks === 'function') {
+          launchFireworks();
+        }
+      }
+    }, 600);
+  } else {
+    // wrong answer (no hints)
+    quizFeedback.style.color = '#b91c1c';
+    quizFeedback.textContent = 'Not quite — try again 💕';
+  }
+}
+
+// submit on Enter
+quizInput.addEventListener('keyup', (e) => {
+  if (e.key === 'Enter') checkQuizAnswer();
+});
+
+// attach button
+quizSubmit.addEventListener('click', checkQuizAnswer);
+
+// start quiz at question 0 (will show q1)
+showQuestion(0);
+</script>
+
+<script>
+// === Birthday / celebration logic (cleaned) ===
+const celebrationScreen = document.getElementById('celebration-screen');
+const blessingVideo = document.getElementById('blessing-video');
+const mainContent = document.getElementById('main-content');
+const backgroundMusic = document.getElementById('background-music');
+const fallbackBtn = document.getElementById('music-fallback');
+
+// play blessing video (used by quiz completion)
+function playBlessing() {
+  if (!blessingVideo) return;
+  blessingVideo.style.display = 'block';
+  blessingVideo.play().catch(() => {
+    // user interaction required on some browsers
+    console.log('Please tap the page to play the blessing video.');
+  });
+}
+
+// when blessing finishes, hide celebration, show main content, THEN start music
+if (blessingVideo) {
+  blessingVideo.addEventListener('ended', () => {
+    if (celebrationScreen) celebrationScreen.style.display = 'none';
+    if (mainContent) mainContent.style.display = 'block';
+
+    // start background music AFTER blessing video ends
+    if (backgroundMusic) {
+      backgroundMusic.currentTime = 0;
+      backgroundMusic.play().catch(() => {
+        // autoplay blocked — show fallback button
+        if (fallbackBtn) fallbackBtn.style.display = 'inline-block';
+      });
+    }
+  });
+}
+
+// fallback button behaviour for background music (only shown if autoplay blocked)
+// fallbackBtn is shown by the quiz-completion code when autopla y fails
+if (fallbackBtn && backgroundMusic) {
+  fallbackBtn.addEventListener('click', () => {
+    backgroundMusic.play().then(() => {
+      fallbackBtn.style.display = 'none';
+    }).catch(() => {
+      console.log('Playback failed after user click.');
+    });
+  });
+}
+
+// fireworks (unchanged)
+function launchFireworks() {
+  const canvas = document.getElementById('fireworks-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const particles = [];
+
+  function randomColor() {
+    return `hsl(${Math.random() * 360}, 100%, 70%)`;
+  }
+
+  for (let i = 0; i < 180; i++) {
+    particles.push({
+      x: canvas.width / 2,
+      y: canvas.height / 2 - 240,
+      angle: Math.random() * 2 * Math.PI,
+      speed: Math.random() * 3 + 2,
+      radius: Math.random() * 3 + 2,
+      color: randomColor(),
+      alpha: 1
+    });
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      const dx = Math.cos(p.angle) * p.speed;
+      const dy = Math.sin(p.angle) * p.speed;
+      p.x += dx;
+      p.y += dy;
+      p.alpha -= 0.015;
+      if (p.alpha < 0) p.alpha = 0;
+      const hueMatch = p.color.match(/\d+\.?\d*/);
+      const hue = hueMatch ? hueMatch[0] : 0;
+      ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${p.alpha})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
+      ctx.fill();
+    });
+    if (particles.some(p => p.alpha > 0)) requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+// === Loop specific part of V2_edited.mp4 (only seconds 8 to 10) ===
+const montage = document.getElementById('main-montage');
+
+if (montage) {
+  const loopStart = 8;   // where looping begins (seconds)
+  const loopEnd = 10;    // where looping ends (seconds)
+
+  montage.addEventListener('loadedmetadata', () => {
+    const endTime = Math.min(loopEnd, montage.duration);
+
+    montage.addEventListener('timeupdate', () => {
+      if (montage.currentTime >= endTime) {
+        montage.currentTime = loopStart;
+        montage.play();
+      }
+    });
+  });
+}
+</script>
+
+</body>
+</html>
